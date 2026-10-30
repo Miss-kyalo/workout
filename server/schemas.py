@@ -27,13 +27,14 @@ class WorkoutExerciseSchema(Schema):
         
         if reps is None and sets is None and duration is None:
             raise ValidationError("Must supply either (reps/sets) or duration_seconds for an exercise.")
+
+
 class WorkoutSchema(Schema):
     id = fields.Int(dump_only=True)
     date = fields.Date(required=True)
     duration_minutes = fields.Int(required=True, validate=validate.Range(min=1))
     notes = fields.Str(allow_none=True)
-
-workout_exercises = fields.List(fields.Nested(WorkoutExerciseSchema), dump_only=True)
+    workout_exercises = fields.List(fields.Nested(WorkoutExerciseSchema), dump_only=True)
 
 exercise_schema = ExerciseSchema()
 exercises_schema = ExerciseSchema(many=True)
