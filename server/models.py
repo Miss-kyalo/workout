@@ -10,7 +10,6 @@ class Exercise(db.Model):
     category = db.Column(db.String, nullable=False)
     equipment_needed=db.Column(db.Boolean,nullable=False,default=False)
 
-#relationships
     workout_exercises = db.relationship(
         "WorkoutExercise",
         back_populates='exercise',
@@ -22,7 +21,6 @@ class Exercise(db.Model):
         back_populates='exercises',
         viewonly=True
     )
-    #validations
     @validates('name')
     def validate_name(self, key, value):
         if not value or not isinstance(value,str) or len(value.strip())==0:
@@ -34,7 +32,7 @@ class Exercise(db.Model):
         allowed_categories = {'Cardio', 'Strength', 'Flexibility', 'Balance'}
         if value not in allowed_categories:
             raise ValueError(
-                f"Category must be one of: {', '.join(allowed_categories)}."
+                f"Category must be one of: {', '.join(sorted(allowed_categories))}."
             )
         return value
     def __repr__(self):
