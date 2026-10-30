@@ -22,7 +22,6 @@ A robust, RESTful backend API designed for personal trainers to track client wor
 
 ## Tech Stack & Dependencies
 
-- **Python:** 3.8.13+
 - **Framework:** Flask (2.2.2)
 - **ORM & Migrations:** Flask-SQLAlchemy (3.0.3), Flask-Migrate (3.1.0)
 - **Serialization & Validation:** Marshmallow (3.20.1)
