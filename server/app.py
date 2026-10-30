@@ -23,7 +23,7 @@ def get_workouts():
 @app.route('/workouts/<int:id>', methods=['GET'])
 def get_workout_by_id(id):
     """Show workout with its associated exercises and metrics."""
-    workout = Workout.query.get(id)
+    workout = db.session.get(Workout, id)
     if not workout:
         return make_response(jsonify({'error': 'Workout not found'}), 404)
     return make_response(jsonify(workout_schema.dump(workout)), 200)
@@ -48,15 +48,18 @@ def create_workout():
         return make_response(jsonify(workout_schema.dump(workout)), 201)
     except ValidationError as err:
         return make_response(jsonify({'errors': err.messages}), 422)
-    except Exception as e:
+    except ValueError as e:
         db.session.rollback()
-        return make_response(jsonify({'error': str(e)}), 400)
+        return make_response(jsonify({'error': str(e)}), 422)
+    except Exception:
+        db.session.rollback()
+        return make_response(jsonify({'error': 'Could not process request'}), 400)
 
 
 @app.route('/workouts/<int:id>', methods=['DELETE'])
 def delete_workout(id):
     """Delete a workout and its WorkoutExercises."""
-    workout = Workout.query.get(id)
+    workout = db.session.get(Workout, id)
     if not workout:
         return make_response(jsonify({'error': 'Workout not found'}), 404)
 
@@ -76,7 +79,7 @@ def get_exercises():
 @app.route('/exercises/<int:id>', methods=['GET'])
 def get_exercise_by_id(id):
     """Show an exercise and its details."""
-    exercise = Exercise.query.get(id)
+    exercise = db.session.get(Exercise, id)
     if not exercise:
         return make_response(jsonify({'error': 'Exercise not found'}), 404)
     return make_response(jsonify(exercise_schema.dump(exercise)), 200)
@@ -101,15 +104,18 @@ def create_exercise():
         return make_response(jsonify(exercise_schema.dump(exercise)), 201)
     except ValidationError as err:
         return make_response(jsonify({'errors': err.messages}), 422)
-    except Exception as e:
+    except ValueError as e:
         db.session.rollback()
-        return make_response(jsonify({'error': str(e)}), 400)
+        return make_response(jsonify({'error': str(e)}), 422)
+    except Exception:
+        db.session.rollback()
+        return make_response(jsonify({'error': 'Could not process request'}), 400)
 
 
 @app.route('/exercises/<int:id>', methods=['DELETE'])
 def delete_exercise(id):
     """Delete an exercise and its associated WorkoutExercises."""
-    exercise = Exercise.query.get(id)
+    exercise = db.session.get(Exercise, id)
     if not exercise:
         return make_response(jsonify({'error': 'Exercise not found'}), 404)
 
@@ -121,11 +127,11 @@ def delete_exercise(id):
 @app.route('/workouts/<int:workout_id>/exercises/<int:exercise_id>/workout_exercises', methods=['POST'])
 def add_exercise_to_workout(workout_id, exercise_id):
     """Add an existing exercise to an existing workout with sets/reps/duration."""
-    workout = Workout.query.get(workout_id)
+    workout = db.session.get(Workout, workout_id)
     if not workout:
         return make_response(jsonify({'error': 'Workout not found'}), 404)
 
-    exercise = Exercise.query.get(exercise_id)
+    exercise = db.session.get(Exercise, exercise_id)
     if not exercise:
         return make_response(jsonify({'error': 'Exercise not found'}), 404)
 
@@ -145,9 +151,12 @@ def add_exercise_to_workout(workout_id, exercise_id):
         return make_response(jsonify(workout_exercise_schema.dump(workout_exercise)), 201)
     except ValidationError as err:
         return make_response(jsonify({'errors': err.messages}), 422)
-    except Exception as e:
+    except ValueError as e:
         db.session.rollback()
-        return make_response(jsonify({'error': str(e)}), 400)
+        return make_response(jsonify({'error': str(e)}), 422)
+    except Exception:
+        db.session.rollback()
+        return make_response(jsonify({'error': 'Could not process request'}), 400)
 
 
 if __name__ == '__main__':
