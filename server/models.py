@@ -12,7 +12,7 @@ class Exercise(db.Model):
 
 #relationships
     workout_exercises = db.relationship(
-        "WorkoutExercise"
+        "WorkoutExercise",
         back_populates='exercise',
         cascade='all, delete-orphan'
     )
@@ -54,7 +54,7 @@ class Workout(db.Model):
     )
     workout_exercises = db.relationship(
         'WorkoutExercise',
-        back_populates='workout'
+        back_populates='workout',
         cascade='all, delete-orphan'
     )
     exercises = db.relationship(
